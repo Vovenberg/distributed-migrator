@@ -1,15 +1,14 @@
 package com.killprojects.migrator.job.actions;
 
 import com.killprojects.migrator.api.RecordTransfer;
-import com.killprojects.migrator.dto.RecordId;
+import com.killprojects.migrator.dto.EntityContainer;
 import com.killprojects.migrator.dto.TransferResult;
 import com.killprojects.migrator.job.ErrorProcessor;
 import com.killprojects.migrator.job.contexts.MainJobContext;
-import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import scala.Tuple2;
 
 @Service
 public class DataTransferServiceImpl<T> implements DataTransferService<T>, RequiredFieldAssertable {
@@ -18,12 +17,14 @@ public class DataTransferServiceImpl<T> implements DataTransferService<T>, Requi
     private ErrorProcessor<T> errorProcessor;
 
     @Override
-    public JavaPairRDD<RecordId, TransferResult> transfer(JavaPairRDD<RecordId, T> idAndObjectPairRDD, MainJobContext context) {
+    public JavaRDD<EntityContainer<T>> transfer(JavaRDD<EntityContainer<T>> dataFrameRDD, MainJobContext context) {
         // каждый объект отправляем, формируем пару <id,результат отправки>
-        return idAndObjectPairRDD.mapToPair(pair -> {
-            TransferResult transferResult = recordTransfer.transfer(pair._2);
-            TransferResult processedResult = errorProcessor.processIfError(transferResult, pair);
-            return Tuple2.apply(pair._1, processedResult);
+        return dataFrameRDD.map(dataFrame -> {
+            TransferResult transferResult = recordTransfer.transfer(dataFrame.getObject());
+            TransferResult processedResult = errorProcessor.processIfError(transferResult, dataFrame);
+
+            dataFrame.setTransferResult(processedResult);
+            return dataFrame;
         });
     }
 

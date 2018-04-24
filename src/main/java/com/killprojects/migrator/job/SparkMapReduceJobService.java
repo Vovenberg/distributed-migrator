@@ -1,57 +1,66 @@
 package com.killprojects.migrator.job;
 
-import com.killprojects.migrator.dto.RecordId;
-import com.killprojects.migrator.dto.TransferResult;
+import com.killprojects.migrator.dto.EntityContainer;
 import com.killprojects.migrator.job.actions.DataConverterService;
 import com.killprojects.migrator.job.actions.DataTransferService;
 import com.killprojects.migrator.job.contexts.MainJobContext;
 import com.killprojects.migrator.job.contexts.ResendJobContext;
 import com.killprojects.migrator.job.contexts.StatisticsJobContext;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.storage.StorageLevel;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.List;
 
 @Service
-public class SparkMapReduceJobService<T> implements MapReduceJobService {
+public class SparkMapReduceJobService<T> implements MapReduceJobService<T> {
 
-    private final JavaSparkContext sparkContext;
+    private final SparkSession sparkSession;
     private final DataTransferService<T> dataTransferService;
     private final DataConverterService<T> dataConverterService;
 
-    public SparkMapReduceJobService(JavaSparkContext sparkContext,
+    public SparkMapReduceJobService(SparkSession sparkSession,
                                     DataTransferService<T> dataTransferService,
                                     DataConverterService<T> dataConverterService) {
-        this.sparkContext = sparkContext;
+        this.sparkSession = sparkSession;
         this.dataTransferService = dataTransferService;
         this.dataConverterService = dataConverterService;
     }
 
     @Override
-    public Map<RecordId, TransferResult> executeMainJob(MainJobContext context) {
-        JavaRDD<String> inputDataRDD = sparkContext.textFile(context.getInputPath());
+    public List<EntityContainer<T>> executeMainJob(MainJobContext context) {
+        JavaRDD<EntityContainer<T>> inputRdd = sparkSession.sparkContext()
+                .textFile(context.getInputPath(), 2)
+                .zipWithIndex()
+                .toJavaRDD()
+                .map(pair -> {
+                    EntityContainer<T> entityContainer = new EntityContainer<>();
+                    entityContainer.setIndex(String.valueOf(pair._2));
+                    entityContainer.setLine(pair._1);
+                    return entityContainer;
+                });
+
 
         //Transformations:
-        JavaPairRDD<RecordId, T> convertedRDD = dataConverterService.convert(inputDataRDD, context);
-
-        JavaPairRDD<RecordId, TransferResult> transferedRDD
-                = dataTransferService.transfer(convertedRDD, context);
+        JavaRDD<EntityContainer<T>> convertedRdd = dataConverterService.convert(inputRdd, context);
+        JavaRDD<EntityContainer<T>> transferedRdd = dataTransferService.transfer(convertedRdd, context);
 
         //cache for subsequent actions
-        transferedRDD.persist(StorageLevel.MEMORY_AND_DISK());
+        transferedRdd.persist(StorageLevel.MEMORY_AND_DISK());
 
         //Actions:
-        transferedRDD.saveAsTextFile(context.getOutputPath() + "/data.txt");
+        Dataset<Row> dataFrame = sparkSession.createDataFrame(transferedRdd, EntityContainer.class);
+        dataFrame.write().json(context.getOutputPath());
 
-        return transferedRDD.collectAsMap();
+        return transferedRdd.collect();
     }
 
     @Override
     public void executeResendJob(ResendJobContext context) {
-        JavaRDD<String> transferedRDD = sparkContext.textFile(context.getOutputPath() + "/data.txt");
+        sparkSession.sparkContext().textFile(context.getOutputPath(), 2);
 
     }
 

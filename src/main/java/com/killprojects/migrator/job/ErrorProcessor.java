@@ -1,10 +1,9 @@
 package com.killprojects.migrator.job;
 
-import com.killprojects.migrator.dto.RecordId;
+import com.killprojects.migrator.dto.EntityContainer;
 import com.killprojects.migrator.dto.TransferResult;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
-import scala.Tuple2;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,7 +17,7 @@ public class ErrorProcessor<T> implements Serializable {
     //@Value("resend-count")
     private int resendCount;
 
-    public TransferResult processIfError(TransferResult result, Tuple2<RecordId, T> idAndObject) {
+    public TransferResult processIfError(TransferResult result, EntityContainer<T> idAndObject) {
         // TODO: 23.04.2018 обработка разных типов ошибок
 
         //если транспортная ошибка
