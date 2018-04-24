@@ -32,7 +32,6 @@ public class DataTransferServiceImpl<T> implements DataTransferService<T>, Requi
         this.recordTransfer = recordTransfer;
     }
 
-
     @Autowired
     public void setErrorProcessor(ErrorProcessor<T> errorProcessor) {
         this.errorProcessor = errorProcessor;

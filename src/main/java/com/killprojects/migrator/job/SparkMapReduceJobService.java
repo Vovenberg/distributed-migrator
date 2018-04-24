@@ -10,6 +10,7 @@ import com.killprojects.migrator.job.contexts.StatisticsJobContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.storage.StorageLevel;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -33,17 +34,24 @@ public class SparkMapReduceJobService<T> implements MapReduceJobService {
     public Map<RecordId, TransferResult> executeMainJob(MainJobContext context) {
         JavaRDD<String> inputDataRDD = sparkContext.textFile(context.getInputPath());
 
+        //Transformations:
         JavaPairRDD<RecordId, T> convertedRDD = dataConverterService.convert(inputDataRDD, context);
 
         JavaPairRDD<RecordId, TransferResult> transferedRDD
                 = dataTransferService.transfer(convertedRDD, context);
 
-        //пока что просто collect
+        //cache for subsequent actions
+        transferedRDD.persist(StorageLevel.MEMORY_AND_DISK());
+
+        //Actions:
+        transferedRDD.saveAsTextFile(context.getOutputPath() + "/data.txt");
+
         return transferedRDD.collectAsMap();
     }
 
     @Override
     public void executeResendJob(ResendJobContext context) {
+        JavaRDD<String> transferedRDD = sparkContext.textFile(context.getOutputPath() + "/data.txt");
 
     }
 

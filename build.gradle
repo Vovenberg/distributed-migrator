@@ -35,5 +35,6 @@ dependencies {
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.2'
+	testCompile 'io.github.glytching:junit-extensions:1.1.0'
 
 }

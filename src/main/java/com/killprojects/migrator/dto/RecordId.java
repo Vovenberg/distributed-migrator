@@ -1,10 +1,14 @@
 package com.killprojects.migrator.dto;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
 @Getter
+@EqualsAndHashCode
+@ToString
 public class RecordId implements Serializable {
 
     private String businessId;

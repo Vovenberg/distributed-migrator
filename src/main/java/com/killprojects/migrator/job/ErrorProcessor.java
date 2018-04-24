@@ -3,14 +3,14 @@ package com.killprojects.migrator.job;
 import com.killprojects.migrator.dto.RecordId;
 import com.killprojects.migrator.dto.TransferResult;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import scala.Tuple2;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Service
-public class ErrorProcessor<T> {
+public class ErrorProcessor<T> implements Serializable {
 
     @Setter
     private List<String> transferErrors;

@@ -2,7 +2,9 @@ package com.killprojects.migrator.api;
 
 import com.killprojects.migrator.dto.RecordId;
 
-public interface RecordIdRegistry<T> {
+import java.io.Serializable;
+
+public interface RecordIdRegistry<T> extends Serializable {
 
     String defineRecordID(T recordObject);
 }

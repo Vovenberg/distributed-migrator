@@ -1,4 +1,6 @@
 package com.killprojects.migrator.dto;
 
-public class TransferResult {
+import java.io.Serializable;
+
+public class TransferResult implements Serializable{
 }

@@ -5,7 +5,9 @@ import com.killprojects.migrator.job.contexts.MainJobContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 
-public interface DataConverterService<T> {
+import java.io.Serializable;
+
+public interface DataConverterService<T> extends Serializable {
 
     JavaPairRDD<RecordId, T> convert(JavaRDD<String> lines, MainJobContext context);
 }
