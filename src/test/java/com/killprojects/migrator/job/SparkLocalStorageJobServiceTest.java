@@ -4,7 +4,6 @@ import com.killprojects.migrator.config.TestConfig;
 import com.killprojects.migrator.dto.EntityContainer;
 import com.killprojects.migrator.dto.TransferResult;
 import com.killprojects.migrator.dto.User;
-import com.killprojects.migrator.job.actions.DataTransferServiceImpl;
 import com.killprojects.migrator.job.contexts.MainJobContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,21 +23,21 @@ import static org.junit.Assert.assertNotNull;
 
 @ExtendWith({SpringExtension.class})
 @ContextConfiguration(classes = TestConfig.class)
-class SparkMapReduceJobServiceTest {
+class SparkLocalStorageJobServiceTest {
 
     @Autowired
-    SparkMapReduceJobService<User> jobService;
+    SparkLocalStorageJobService<User> jobService;
 
     @Autowired
-    DataTransferServiceImpl<User> dataTransferService;
+    BusinessPipeline<User> businessPipeline;
 
 
     @Test
-    @DisplayName("совместный запуск конвертации и трансфера")
+    @DisplayName("главная джоба на заглушках")
     void executeMainJob() throws IOException {
         List<User> targetSystemEmulationList = new ArrayList<>();
 
-        dataTransferService.setRecordTransfer(user -> {
+        businessPipeline.setRecordTransfer(user -> {
             targetSystemEmulationList.add(user);
             return new TransferResult();
         });

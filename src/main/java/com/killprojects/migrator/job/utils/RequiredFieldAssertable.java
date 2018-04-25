@@ -1,4 +1,4 @@
-package com.killprojects.migrator.job.actions;
+package com.killprojects.migrator.job.utils;
 
 public interface RequiredFieldAssertable {
 

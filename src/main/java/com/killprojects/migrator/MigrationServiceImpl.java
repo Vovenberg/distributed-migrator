@@ -1,15 +1,15 @@
 package com.killprojects.migrator;
 
-import com.killprojects.migrator.job.MapReduceJobService;
+import com.killprojects.migrator.job.JobService;
 import com.killprojects.migrator.dto.OnlineStatistics;
 import org.springframework.stereotype.Service;
 
 @Service
 public final class MigrationServiceImpl implements MigrationService {
 
-    private final MapReduceJobService jobService;
+    private final JobService jobService;
 
-    public MigrationServiceImpl(MapReduceJobService jobService) {
+    public MigrationServiceImpl(JobService jobService) {
         this.jobService = jobService;
     }
 

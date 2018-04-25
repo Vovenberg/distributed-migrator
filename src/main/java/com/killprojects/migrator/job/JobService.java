@@ -8,7 +8,7 @@ import com.killprojects.migrator.job.contexts.StatisticsJobContext;
 import java.io.Serializable;
 import java.util.List;
 
-public interface MapReduceJobService<T> extends Serializable {
+public interface JobService<T> extends Serializable {
 
     List<EntityContainer<T>> executeMainJob(MainJobContext context);
 
