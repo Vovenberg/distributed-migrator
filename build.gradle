@@ -33,7 +33,6 @@ dependencies {
 	compile group: 'org.apache.spark', name: 'spark-core_2.11', version: '2.3.0'
 	compile('org.springframework.boot:spring-boot-starter')
 	compile group: 'org.apache.spark', name: 'spark-sql_2.11', version: '2.3.0'
-	testCompile "org.apache.hadoop:hadoop-minicluster:2.7.1"
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.2'

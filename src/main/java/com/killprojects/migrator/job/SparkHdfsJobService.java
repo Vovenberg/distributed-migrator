@@ -17,6 +17,6 @@ public class SparkHdfsJobService<T> extends AbstractSparkJobService<T> {
 
     @Override
     void saveOutputRdd(JavaRDD<EntityContainer<T>> outputRdd, String outputPath) {
-        outputRdd.saveAsTextFile(outputPath);
+
     }
 }

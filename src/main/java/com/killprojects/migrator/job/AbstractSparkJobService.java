@@ -9,7 +9,6 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.storage.StorageLevel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public abstract class AbstractSparkJobService<T> implements JobService<T> {
     @Autowired
     protected SparkSession sparkSession;
 
-    private BusinessPipeline<T> businessPipeline;
+    private ExtendedBusinessPipeline<T> businessPipeline;
 
 
     abstract JavaRDD<String> extractInputRdd(String inputPath);
@@ -57,7 +56,7 @@ public abstract class AbstractSparkJobService<T> implements JobService<T> {
     }
 
     @Autowired
-    public void setBusinessPipeline(BusinessPipeline<T> businessPipeline) {
+    public void setBusinessPipeline(ExtendedBusinessPipeline<T> businessPipeline) {
         this.businessPipeline = businessPipeline;
     }
 }
